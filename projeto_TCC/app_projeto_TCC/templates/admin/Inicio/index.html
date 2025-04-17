@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'Css/admin/Inicio/index.css' %}">
+    <title>Home</title>
+</head>
+<body>
+    <header>
+        <nav class="nav-items">
+            <a href="{% url 'dashboard_page' %}">Dashboard</a>
+            <a href="{% url 'cadastroFuncionario_page' %}">Usuarios</a>
+            <a href="#">Produtos</a>
+            <a href="#">Historico</a>
+            <a href="#">Relatorios</a>
+        </nav>
+        <label>{{user.username}}</label>
+    </header>
+
+    <main>
+        {% block conteudo %}
+        {% endblock %}
+    </main>
+</body>
+</html>

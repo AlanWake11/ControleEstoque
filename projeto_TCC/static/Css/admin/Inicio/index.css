@@ -1,0 +1,41 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header{
+    background: blue;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 50px;
+    width: 100%;
+}
+
+header label{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height:45px;
+    width: 45px;
+    text-align: center;
+}
+
+.nav-items{
+    display: flex;
+    gap: 50px;
+}
+
+.nav-items a{
+    text-decoration: none;
+    color: white;
+}
+
+.nav-items a:hover{
+    transform: scale(1.2);
+}
+
+
