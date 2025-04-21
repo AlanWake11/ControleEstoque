@@ -14,7 +14,7 @@ class Cliente(models.Model):
 
 # Produto que será transportado
 class Produto(models.Model):
-    nome = models.CharField(max_length=100)
+    nome = models.TextField(max_length=100)
     descricao = models.TextField(blank=True, null=True)
     peso = models.FloatField(help_text="Peso em kg")
     valor = models.DecimalField(max_digits=10, decimal_places=2)

@@ -91,10 +91,26 @@ def login_page(request):
 def home_page(request):
     return render(request, 'admin/Inicio/index.html')
 
-@login_required(login_url='start_page')
-def cadastroFuncionario_page(request):
-    return render(request, 'admin/Inicio/cadastrar_funcionario.html')
 
 @login_required(login_url='start_page')
 def dashboard_page(request):
     return render(request, 'admin/Inicio/dashboard.html')
+
+@login_required(login_url='start_page')
+def cadastroUsuario_page(request):
+    return render(request, 'admin/Inicio/cadastroUsuario.html')
+
+@login_required(login_url='start_page')
+def cadastroCliente_page(request):
+    return render(request, 'admin/Inicio/cadastroCliente.html')
+
+@login_required(login_url='start_page')
+def cadastroFornecedor_page(request):
+    return render(request, 'admin/Inicio/cadastroFornecedor.html')
+
+@login_required(login_url='start_page')
+def cadastroProduto_page(request):
+    return render(request, 'admin/Inicio/cadastroProduto.html')
+
+def cadastroNotaFiscal_page(request):
+    return render(request, 'admin/Inicio/notafiscal.html')

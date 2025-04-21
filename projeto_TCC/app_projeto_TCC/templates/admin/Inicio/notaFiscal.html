@@ -1,0 +1,195 @@
+{% extends 'admin/Inicio/index.html' %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Nota Fiscal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light" onload="carregarItensNota()">
+  {% block conteudo %}
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-10">
+        <div class="card shadow">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><strong>Cadastro de Nota Fiscal</strong></h4>
+          </div>
+          <div class="card-body">
+            <form action="/nota-fiscal/cadastrar" method="post">
+              <div class="row">
+                <!-- Campos principais -->
+                <div class="col-md-4 mb-3">
+                  <label for="tipo" class="form-label">Tipo</label>
+                  <select id="tipo" name="tipo" class="form-select" required>
+                    <option value="">Selecione</option>
+                    <option value="entrada">Entrada</option>
+                    <option value="saida">Saída</option>
+                  </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="operacao" class="form-label">Operação</label>
+                  <select id="operacao" name="operacao" class="form-select" required>
+                    <option value="">Selecione</option>
+                    <option>Perda/Estrago</option>
+                    <option>Transf. Empréstimo</option>
+                    <option>Transf. Retorno</option>
+                    <option>Transferência</option>
+                    <option>Venda Atacado</option>
+                    <option>Venda Varejo</option>
+                  </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="deposito" class="form-label">Depósito</label>
+                  <input type="text" id="deposito" name="deposito" class="form-control" required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="status" class="form-label">Status</label>
+                  <select id="status" name="status" class="form-select">
+                    <option>Ativado</option>
+                    <option>Pendente</option>
+                    <option>Cancelado</option>
+                  </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="numero" class="form-label">Número da Nota Fiscal</label>
+                  <input type="text" id="numero" name="numero" class="form-control" required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="remetente" class="form-label">Remetente</label>
+                  <input type="text" id="remetente" name="remetente" class="form-control">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="data" class="form-label">Data</label>
+                  <input type="date" id="data" name="data" class="form-control">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="responsavel" class="form-label">Responsável</label>
+                  <input type="text" id="responsavel" name="responsavel" class="form-control">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                  <label for="valorTotal" class="form-label">Valor Total</label>
+                  <input type="number" id="valorTotal" name="valorTotal" step="0.01" class="form-control">
+                </div>
+              </div>
+
+              <!-- Botão adicionar -->
+              <div class="mb-3">
+                <button type="button" class="btn btn-outline-primary" onclick="abrirExibirProdutosNotaFiscal()">
+                  Adicionar Itens
+                </button>
+              </div>
+
+              <!-- Tabela de itens -->
+              <h5 class="mt-4">Itens da Nota Fiscal</h5>
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover text-center align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Código</th>
+                      <th>Nome</th>
+                      <th>Validade</th>
+                      <th>Local</th>
+                      <th>Valor Unitário</th>
+                      <th>Quant.</th>
+                      <th>Unid.</th>
+                      <th>Total</th>
+                      <th>Ação</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabelaItens"></tbody>
+                </table>
+              </div>
+
+              <!-- Botões finais -->
+              <div class="d-flex justify-content-between mt-4">
+                <a href="javascript:history.back()" class="btn btn-secondary">Voltar</a>
+                <button type="submit" class="btn btn-success"><strong>Gravar Nota Fiscal</strong></button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    function carregarItensNota() {
+      const tabela = document.getElementById("tabelaItens");
+      const itens = JSON.parse(localStorage.getItem("itensNota")) || [];
+
+      tabela.innerHTML = "";
+      itens.forEach((item, index) => {
+        const row = `
+          <tr>
+            <td>${item.codigo}</td>
+            <td>${item.nome}</td>
+            <td>${item.validade}</td>
+            <td>${item.local}</td>
+            <td>
+              <input type="number" class="form-control form-control-sm text-center"
+                     value="${item.valorUnitario || ''}" min="0" step="0.01"
+                     onchange="atualizarCampo(${index}, 'valorUnitario', this.value)">
+            </td>
+            <td>
+              <input type="number" class="form-control form-control-sm text-center"
+                     value="${item.quantidade || ''}" min="0" step="1"
+                     onchange="atualizarCampo(${index}, 'quantidade', this.value)">
+            </td>
+            <td>${item.unidade}</td>
+            <td id="total-${index}">R$ ${item.total || '0.00'}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="removerItem(${index})">x</button></td>
+          </tr>
+        `;
+        tabela.innerHTML += row;
+      });
+    }
+
+    function atualizarCampo(index, campo, valor) {
+      let itens = JSON.parse(localStorage.getItem("itensNota")) || [];
+      itens[index][campo] = parseFloat(valor) || 0;
+
+      const qtd = parseFloat(itens[index].quantidade) || 0;
+      const unit = parseFloat(itens[index].valorUnitario) || 0;
+      const total = (qtd * unit).toFixed(2);
+      itens[index].total = total;
+
+      localStorage.setItem("itensNota", JSON.stringify(itens));
+
+      const totalCell = document.getElementById(`total-${index}`);
+      if (totalCell) {
+        totalCell.innerText = `R$ ${total}`;
+      }
+    }
+
+    function removerItem(index) {
+      let itens = JSON.parse(localStorage.getItem("itensNota")) || [];
+      itens.splice(index, 1);
+      localStorage.setItem("itensNota", JSON.stringify(itens));
+      carregarItensNota();
+    }
+
+    function abrirExibirProdutosNotaFiscal() {
+      window.open('exibirProdutoNotaFiscal.html', '_blank', 'width=1000,height=600');
+    }
+
+    // Atualiza os itens sempre que voltar o foco para a aba
+    window.addEventListener("focus", carregarItensNota);
+  </script>
+   {% endblock conteudo %}
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
