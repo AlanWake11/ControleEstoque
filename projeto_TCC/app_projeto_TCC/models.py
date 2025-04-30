@@ -2,72 +2,51 @@ from django.db import models
 
 # Create your models here.
 
-# Cliente que faz pedidos
-class Cliente(models.Model):
+class Usuarios(models.Model):
     nome = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    telefone = models.CharField(max_length=15, blank=True, null=True)
-    endereco = models.TextField()
+    senha_hash = models.CharField(max_length=150)
+    cargo = models.CharField(max_length=50)
+    permissao = models.CharField(max_length=50)
 
-    def __str__(self):
-        return self.nome
+class Historico(models.Model):
+    usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
+    acao = models.CharField(max_length=255)
+    data_hora = models.DateTimeField(auto_now_add=True)
 
-# Produto que será transportado
-class Produto(models.Model):
-    nome = models.TextField(max_length=100)
-    descricao = models.TextField(blank=True, null=True)
-    peso = models.FloatField(help_text="Peso em kg")
-    valor = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return self.nome
-
-# Pedido feito por um cliente
-class Pedido(models.Model):
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
-    data_pedido = models.DateTimeField(auto_now_add=True)
-    status_choices = [
-        ('Pendente', 'Pendente'),
-        ('Em Transporte', 'Em Transporte'),
-        ('Entregue', 'Entregue'),
-        ('Cancelado', 'Cancelado'),
-    ]
-    status = models.CharField(max_length=20, choices=status_choices, default='Pendente')
-
-    def __str__(self):
-        return f'Pedido {self.id} - {self.cliente.nome}'
-
-# Itens dentro de um pedido
-class ItemPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name='itens')
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    quantidade = models.PositiveIntegerField()
-
-    def __str__(self):
-        return f'{self.quantidade}x {self.produto.nome} (Pedido {self.pedido.id})'
-
-# Transportadora responsável pela entrega
-class Transportadora(models.Model):
+class Clientes(models.Model):
     nome = models.CharField(max_length=100)
-    telefone = models.CharField(max_length=15, blank=True, null=True)
+    cpf = models.CharField(max_length=14, blank=True)
+    cnpj = models.CharField(max_length=18, blank=True)
+    telefone = models.CharField(max_length=15, unique=True)
     email = models.EmailField(unique=True)
-    
-    def __str__(self):
-        return self.nome
 
-# Registro de entrega
-class Entrega(models.Model):
-    pedido = models.OneToOneField(Pedido, on_delete=models.CASCADE)
-    transportadora = models.ForeignKey(Transportadora, on_delete=models.CASCADE)
-    data_saida = models.DateTimeField()
-    data_prevista_entrega = models.DateTimeField()
-    data_real_entrega = models.DateTimeField(blank=True, null=True)
-    status_choices = [
-        ('A Caminho', 'A Caminho'),
-        ('Entregue', 'Entregue'),
-        ('Atrasado', 'Atrasado'),
-    ]
-    status = models.CharField(max_length=20, choices=status_choices, default='A Caminho')
+class Fornecedores(models.Model):
+    cnpj = models.CharField(max_length=18)
+    nome = models.CharField(max_length=100)
+    telefone = models.CharField(max_length=15, unique=True)
+    email = models.EmailField(unique=True)
 
-    def __str__(self):
-        return f'Entrega do Pedido {self.pedido.id} - {self.status}'
+class Produtos(models.Model):
+    fornecedor = models.ForeignKey(Fornecedores, on_delete=models.CASCADE)
+    nome = models.CharField(max_length=100)
+    codigo = models.IntegerField()
+    categoria = models.CharField(max_length=50)
+    quantidade_estoque = models.IntegerField()
+    validade = models.DateField()
+    localizacao = models.CharField(max_length=100)
+    preco_custo = models.IntegerField()
+    preco_venda = models.IntegerField()
+
+class Movimentacoes(models.Model):
+    usuario = models.ForeignKey(Usuarios, on_delete=models.CASCADE)
+    produto = models.ForeignKey(Produtos, on_delete=models.CASCADE)
+    cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=20)
+    quantidade = models.IntegerField()
+    data_movimentacao = models.DateField(auto_now_add=True)
+    observacao = models.CharField(max_length=255, blank=True, null=True)
+    preco_unitario = models.FloatField()
+    valor_total = models.FloatField()
+
+

@@ -32,9 +32,16 @@ urlpatterns = [
     path('notaFiscal/', views.cadastroNotaFiscal_page, name='cadastroNotaFiscal_page'),
     path('login/', views.login_page, name='login_page'),
     path('home/', views.home_page, name='home_page'),
-    path('dashboard/', views.dashboard_page, name='dashboard_page'),
+    path('exibicaoCliente/', views.exibir_clientes_page, name='exibir_clientes_page'),
+    path('exibicaoFornecedor/', views.exibir_fornecedores_page, name='exibir_fornecedores_page'),
+    path('exibicaoProduto/', views.exibir_produtos_page, name='exibir_produtos_page'),
+    path('exibicaoUsuario/', views.exibir_usuarios_page, name='exibir_usuarios_page'),
 
     # Funções Webs #
     path('cadastrarAdmin/', views.cadastrar_admin, name='cadastrar_admin'),
     path('loginUsuario/', views.login_usuario, name='logar_usuario'),
+    path('cadastrarCliente/', views.cadastro_cliente, name='cadastro_cliente'),
+    path('cadastrarUsuario/', views.cadastro_usuario, name='cadastro_usuario'),
+    path('cadastroProduto/', views.cadastro_produto, name='cadastro_produto')
+
 ]  

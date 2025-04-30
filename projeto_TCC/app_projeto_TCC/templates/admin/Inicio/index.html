@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'Css/admin/Inicio/index.css' %}">
+    <link rel="stylesheet" href="{% static 'Css/messeges/messege.css' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>Home</title>
 </head>
@@ -22,18 +23,31 @@
                     <a href="{% url 'cadastroNotaFiscal_page' %}">Nota Fiscal</a>
                 </div>
             </div>
-            <div class="dropdown-dashboard">
-                <button>Dashboard</button>
-                <div class="conteudo-dashboard">
-                    <a href="{% url 'dashboard_page' %}">Dashboard</a>
+            <div class="dropdown-exibir">
+                <button>Exibir</button>
+                <div class="conteudo-exibir">
+                    <a href="{% url 'exibir_clientes_page' %}">Clientes</a>
+                    <a href="{% url 'exibir_fornecedores_page' %}">Fornecedores</a>
+                    <a href="{% url 'exibir_usuarios_page' %}">Usuarios</a>
+                    <a href="{% url 'exibir_produtos_page' %}">Produtos</a>
                 </div>
             </div>
         </nav>
     </header>
 
     <main>
-        {% block conteudo %}
-        {% endblock %}
+        <div class="conteudo-main"> 
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% block conteudo %}
+            {% endblock %}
+        </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>

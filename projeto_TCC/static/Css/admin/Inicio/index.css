@@ -6,17 +6,18 @@
 
 body{
     display: flex;
+    min-height: 100vh;
 }
 
 header{
-    background: rgb(20, 0, 176);
-    border-right: 2px solid black;
+    position: fixed;
     text-align: center;
-    justify-content: center;
-    height: 100vh;
+    background: rgb(10, 0, 86);
+    border-right: 2px solid black;
+    min-height: 100vh;
     min-width: 20%;
     max-width: 12%;
-
+    font-family: monospace;
 }
 
 header h2{
@@ -35,15 +36,27 @@ header h2{
     color: white;
 }
 
+.nav-items .dropdown-cadastrar{
+    display: inline;
+}
 
-.nav-items .dropdown-dashboard .conteudo-dashboard{
+.nav-items .dropdown-exibir{
+    display: inline;
+}
+
+.nav-items .dropdown-exibir .conteudo-exibir{
     display: none;
 }
 
-.nav-items .dropdown-dashboard:hover .conteudo-dashboard{
+.nav-items .dropdown-exibir:hover .conteudo-exibir{
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.nav-items .dropdown-exibir .conteudo-exibir a:hover{
+    background-color: gray;
+
 }
 
 .nav-items .dropdown-cadastrar .conteudo-cadastrar{
@@ -54,15 +67,18 @@ header h2{
 .nav-items .dropdown-cadastrar:hover .conteudo-cadastrar{
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    gap: 8px;
+    justify-content: center;
+    gap: 10px;
+}
+
+.nav-items .dropdown-cadastrar .conteudo-cadastrar a:hover{
+    background-color: gray;
+    color: black;
 }
 
 main{
+    display: block;
     background: linear-gradient(45deg, rgb(0, 0, 106),black);
     width: 100vw;
-    height: 100vh;
-        
+    padding-left: 20%;
 }
-
-
