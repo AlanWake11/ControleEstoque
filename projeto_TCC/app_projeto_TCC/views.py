@@ -91,7 +91,12 @@ def cadastro_cliente(request):
             else:
                 return HttpResponse('Não é CPF, nem CNPJ')
 
+            if len(novo_cliente.telefone) != 10:
+                messages.error(request, 'Numero de telefone invalido')
+                return redirect('home_page')
+
             novo_cliente.save()
+            messages.success(request, 'Cadastro do cliente realizado com sucesso!')
 
             return redirect('home_page')
 
