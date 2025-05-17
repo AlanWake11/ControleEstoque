@@ -10,13 +10,13 @@ body{
 }
 
 header{
-    position: fixed;
     text-align: center;
-    background: rgb(10, 0, 86);
-    border-right: 2px solid black;
+    background: black;
+    border-right: 5px solid deeppink;
     min-height: 100vh;
     min-width: 20%;
     max-width: 12%;
+    
 }
 
 header h2{
@@ -24,10 +24,18 @@ header h2{
 }
 
 .nav-items button{
+    background-color: black;
+    color: white;
     height: 50px;
-    width: 100%;
+    width: 90%;
     border: none;
     margin-top: 40px;
+}
+
+.nav-items button:hover{
+    background-color: deeppink;
+    color:black;
+    border-radius: 10px;
 }
 
 .nav-items a{
@@ -35,51 +43,50 @@ header h2{
     color: white;
 }
 
-.nav-items .dropdown-cadastrar{
+.nav-items .dropdown{
     display: inline;
 }
 
-.nav-items .dropdown-exibir{
-    display: inline;
-}
-
-.nav-items .dropdown-exibir .conteudo-exibir{
-    display: none;
-}
-
-.nav-items .dropdown-exibir:hover .conteudo-exibir{
+.nav-items .dropdown .dropdown-conteudo{
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: 10px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
 }
 
-.nav-items .dropdown-exibir .conteudo-exibir a:hover{
-    background-color: gray;
+.nav-items .dropdown:hover .dropdown-conteudo{
+    max-height: 500px;
+    opacity: 1;
+}
+
+.nav-items .dropdown:hover .dropdown-conteudo a:hover{
+    background-color: violet;
     color: black;
-
 }
 
-.nav-items .dropdown-cadastrar .conteudo-cadastrar{
-    display: none;
-    
+
+.nav-items .dropdown button a:hover{
+    background-color: pink;
 }
 
-.nav-items .dropdown-cadastrar:hover .conteudo-cadastrar{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 10px;
+.nav-items button .icon{
+    position: absolute;
+    left: 40px;
 }
 
-.nav-items .dropdown-cadastrar .conteudo-cadastrar a:hover{
-    background-color: gray;
-    color: black;
+@media (max-width: 1200px){
+    .nav-items button .icon{
+        display: none;
+    }
 }
 
 main{
-    display: block;
-    background: linear-gradient(45deg, white,gray);
-    width: 100vw;   
-    padding-left: 20%;
+    width: 100%;
+    min-height: 100%;   
+    padding-left: 10%;
+    padding-top: 50px;
 }

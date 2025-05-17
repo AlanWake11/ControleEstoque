@@ -27,7 +27,7 @@ urlpatterns = [
     path('cadastro/', views.cadastro_page, name='cadastro_page'),
     path('cadastroCliente/', views.cadastroCliente_page, name= 'cadastroCliente_page'),
     path('cadastroFornecedor/', views.cadastroFornecedor_page, name='cadastroFornecedor_page'),
-    path('cadastroProduto', views.cadastroProduto_page, name='cadastroProduto_page'),
+    path('cadastroProduto/', views.cadastroProduto_page, name='cadastroProduto_page'),
     path('cadastroUsuario/', views.cadastroUsuario_page, name='cadastroUsuario_page'),
     path('notaFiscal/', views.cadastroNotaFiscal_page, name='cadastroNotaFiscal_page'),
     path('login/', views.login_page, name='login_page'),
@@ -36,12 +36,17 @@ urlpatterns = [
     path('exibicaoFornecedor/', views.exibir_fornecedores_page, name='exibir_fornecedores_page'),
     path('exibicaoProduto/', views.exibir_produtos_page, name='exibir_produtos_page'),
     path('exibicaoUsuario/', views.exibir_usuarios_page, name='exibir_usuarios_page'),
+    path('exibicaoNotaFiscal/', views.exibir_notasFiscais_page, name='exibir_notasFiscais_page'),
+    path('exibirProdutoNotaFiscal/', views.exibirProdutoNotaFiscal_page, name='exibirProdutoNotaFiscal_page'),
 
     # Funções Webs #
     path('cadastrarAdmin/', views.cadastrar_admin, name='cadastrar_admin'),
     path('loginUsuario/', views.login_usuario, name='logar_usuario'),
+    path('logout/', views.logout_usuario, name='logout'),
     path('cadastrarCliente/', views.cadastro_cliente, name='cadastro_cliente'),
     path('cadastrarUsuario/', views.cadastro_usuario, name='cadastro_usuario'),
-    path('cadastroProduto/', views.cadastro_produto, name='cadastro_produto')
+    path('cadastrarProduto/', views.cadastro_produto, name='cadastro_produto'),
+    path('cadastrarFornecedor/', views.cadastro_fornecedor, name='cadastro_fornecedor'),
+    path('cadastrarNotaFiscal/', views.cadastro_nota_fiscal, name='cadastro_nota_fiscal'),
 
 ]  

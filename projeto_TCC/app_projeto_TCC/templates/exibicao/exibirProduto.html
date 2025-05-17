@@ -14,7 +14,7 @@
   <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Produtos em Estoque</h2>
-      <a href="/produtos/cadastrar" class="btn btn-primary">Novo Produto</a>
+      <a href="{% url 'cadastroProduto_page' %}" class="btn btn-primary">Novo Produto</a>
     </div>
 
     <!-- Campo de busca -->
@@ -40,19 +40,21 @@
         </thead>
         <tbody>
           <!-- Exemplo estático (substituir por loop do Django) -->
+          {%for produto in produtos%}
           <tr>
-            <td>1</td>
-            <td>Álcool Gel 70%</td>
-            <td>ALC001</td>
-            <td>Higiene</td>
-            <td>120</td>
-            <td>2025-03-10</td>
-            <td>Fornecedor Saúde LTDA</td>
+            <td>{{produto.id}}</td>
+            <td>{{produto.nome}}</td>
+            <td>{{produto.codigo}}</td>
+            <td>{{produto.categoria}}</td>
+            <td>{{produto.quantidade_estoque}}</td>
+            <td>{{produto.validade}}</td>
+            <td>{{produto.fornecedor}}</td>
             <td>
               <a href="/produtos/1" class="btn btn-sm btn-info">Ver</a>
               <a href="/produtos/1/editar" class="btn btn-sm btn-warning">Editar</a>
               <a href="/produtos/1/excluir" class="btn btn-sm btn-danger">Excluir</a>
             </td>
+            {%endfor%}
           </tr>
 
           <!-- Repetir o bloco acima com os produtos do banco -->

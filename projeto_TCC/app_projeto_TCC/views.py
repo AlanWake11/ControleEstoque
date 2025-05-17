@@ -1,15 +1,21 @@
+from .models import *
+from .forms import *
+from django.forms import modelformset_factory, inlineformset_factory
+from django.db import DatabaseError, transaction
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse
 from django.contrib.auth.models import User
-from .models import Clientes, Fornecedores, Historico, Movimentacoes, Usuarios, Produtos
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as login_django, logout
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth.hashers import make_password
+import json
+
 
 # Create your views here.
 
-### Funções ###
+### Login ###
 
 # Verifica se o banco de dados está vazio, se sim, cadastra o administrador
 def verificar_bd(request):
@@ -20,11 +26,6 @@ def verificar_bd(request):
             return redirect('login_page')
     except Exception as e:
         return HttpResponse(f'Erro ao verificar o banco de dados: {e}')
-
-# Logout do usuario
-def logout_usuario(request):
-    if request.user.is_authenticated:
-        logout(request)
 
 # Cadastrar o administrador 
 def cadastrar_admin(request):
@@ -48,6 +49,12 @@ def cadastrar_admin(request):
     except Exception as e:
         return HttpResponse(e)
 
+# Logout do usuario
+def logout_usuario(request):
+    if request.user.is_authenticated:
+        logout(request)
+    return redirect('start_page')
+
 # Logar usuario
 def login_usuario(request):
     try:
@@ -59,7 +66,6 @@ def login_usuario(request):
                 user = authenticate(username=usuario.username, password=senha)
                 if user:
                     login_django(request, user)
-                    request.session['username'] = user.username
                     return redirect('home_page')
                 else:
                     messages.error(request, 'Senha incorreta')
@@ -75,7 +81,7 @@ def login_usuario(request):
 
 ### Cadastros ###
 
-def cadastro_cliente(request):
+# def cadastro_cliente(request):
     try: 
         if request.method == 'POST':
             novo_cliente = Clientes()
@@ -104,26 +110,38 @@ def cadastro_cliente(request):
         messages.error(request, e)
         return redirect('home_page') 
 
+# Cadastrar cliente
+def cadastro_cliente(request):
+    try:
+        if request.method == "POST":
+            form = ClienteForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Cadastro do cliente realizado com sucesso!')
+                
+                return redirect('home_page')
+            else:
+                return render(request, 'cadastro/cadastroCliente.html', {'form':form})
+
+    except DatabaseError as e:
+        messages.error(request, f'Erro no banco de dados: {str(e)}')
+        return redirect('home_page')
+
+    except Exception as e:
+        return HttpResponse(e)
+
+# Cadastrar Usuario
 def cadastro_usuario(request):
     try:
         if request.method == 'POST':
-            novo_usuario = Usuarios()
-            novo_usuario.nome = request.POST.get('nome')
-            novo_usuario.cpf = request.POST.get('documento')
-            novo_usuario.email = request.POST.get('email')
-            novo_usuario.telefone = request.POST.get('telefone')
-            novo_usuario.cargo = request.POST.get('cargo')
-            senha = request.POST.get('senha')
-            senha_hash = make_password(senha)
-            novo_usuario.senha_hash = senha_hash
-
-            if Usuarios.objects.filter(email=novo_usuario.email).exists():
-                return HttpResponse('Email já cadastrado!')
-
-            novo_usuario.save()
-            messages.success(request, 'Usuario cadastrado com sucesso!')
+            form = UsuarioForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Usuario cadastrado com sucesso!')
+                return redirect('home_page')
             
-            return redirect('home_page')
+            else:
+                return render(request, 'cadastro/cadastroUsuario.html', {'form':form})
 
     except Exception as e:
         messages.error(request, e)
@@ -132,22 +150,14 @@ def cadastro_usuario(request):
 def cadastro_produto(request):
     try:
         if request.method == 'POST':
-            novo_produto = Produtos()
-            novo_produto.nome = request.POST.get('nome')
-            novo_produto.codigo = request.POST.get('codigo')
-            novo_produto.categoria = request.POST.get('categoria')
-            novo_produto.quantidade_estoque = request.POST.get('quantidade')
-            novo_produto.localizacao = request.POST.get('localizacao')
-            novo_produto.validade = request.POST.get('validade')
-            novo_produto.preco_custo = request.POST.get('preco_custo')
-            novo_produto.preco_venda = request.POST.get('preco_venda')
-            novo_produto.fornecedor = request.POST.get('fornecedor_id')
-
-            novo_produto.save()
-            messages.success(request, 'Produto cadastrado com sucesso!')
-
-            return redirect('home_page')
-
+            form = ProdutoForm(request.POST)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Produto cadastrado com sucesso!')
+                return redirect('home_page')
+            else:
+                messages.warning(request, 'Houve uma falha')
+                return redirect('home_page')
 
     except Exception as e:
         messages.error(request, e)
@@ -156,24 +166,83 @@ def cadastro_produto(request):
 def cadastro_fornecedor(request):
     try:
         if request.method == 'POST':
-            novo_fornecedor = Fornecedores()
-            novo_fornecedor.nome = request.POST.get('nome')
-            novo_fornecedor.cnpj = request.POST.get('documento')
-            novo_fornecedor.telefone = request.POST.get('telefone')
-            novo_fornecedor.email = request.POST.get('email')
+            form = FornecedorForm(request.POST)
+            if form.is_valid():
+               messages.success(request, 'Fornecedor cadastrado com sucesso!')
+               form.save()
 
-            novo_fornecedor.save()
-            messages.success(request, 'Fornecedor cadastrado com sucesso!')
+               return redirect('home_page')
+            
+            else:
+                return render(request,'cadastro/cadastroFornecedor.html',{'form':form})
 
-            return redirect('home_page')
-        
     except Exception as e:
         messages.error(request, e)
         return redirect('home_page')
 
+@require_http_methods(["GET", "POST"])
+def cadastro_nota_fiscal(request):
+    if request.method == "POST":
+        try:
+            # Dados do formulário
+            tipo = request.POST.get("tipo")
+            operacao = request.POST.get("operacao")
+            deposito = request.POST.get("deposito")
+            status = request.POST.get("status")
+            numero = request.POST.get("numero")
+            remetente = request.POST.get("remetente")
+            data_emissao = request.POST.get("data") or None
+            responsavel_nome = request.POST.get("responsavel")
+            valor_total = request.POST.get("valorTotal") or 0
+            itens_json = request.POST.get("itensNota")
 
+            # Buscar o responsável (usuário) pelo nome
+            responsavel = Usuarios.objects.filter(nome=responsavel_nome).first() if responsavel_nome else None
 
-# Paginas Webs #
+            # Começar transação
+            with transaction.atomic():
+                # Criar nota fiscal
+                nota = NotaFiscal.objects.create(
+                    tipo=tipo,
+                    operacao=operacao,
+                    deposito=deposito,
+                    status=status,
+                    numero=numero,
+                    remetente=remetente,
+                    data_emissao=data_emissao,
+                    responsavel=responsavel,
+                    valor_total=valor_total
+                )
+
+                # Processar e criar itens
+                itens = json.loads(itens_json or "[]")
+                for item in itens:
+                    produto = Produtos.objects.get(codigo=item["codigo"])  # ajuste conforme seu modelo
+                    quantidade = int(item.get("quantidade", 0))
+                    valor_unitario = float(item.get("valorUnitario", 0))
+                    valor_total_item = round(quantidade * valor_unitario, 2)
+
+                    ItemNotaFiscal.objects.create(
+                        nota_fiscal=nota,
+                        produto=produto,
+                        quantidade=quantidade,
+                        valor_unitario=valor_unitario,
+                        valor_total=valor_total_item
+                    )
+
+            messages.success(request, "Nota fiscal cadastrada com sucesso!")
+            return redirect('home_page')  # ou outra view/URL conforme seu fluxo
+
+        except Produtos.DoesNotExist:
+            messages.error(request, "Produto não encontrado.")
+        except json.JSONDecodeError:
+            messages.error(request, "Erro ao processar os itens da nota.")
+        except Exception as e:
+            messages.error(request, f"Erro ao salvar nota fiscal: {str(e)}")
+
+    return render(request, 'admin/Inicio/index.html')
+
+### Paginas Webs ###
 
 def start_page(request):
     logout_usuario(request)
@@ -200,23 +269,35 @@ def dashboard_page(request):
 
 @login_required(login_url='start_page')
 def cadastroUsuario_page(request):
-    return render(request, 'cadastro/cadastroUsuario.html')
+    form = UsuarioForm()
+    return render(request, 'cadastro/cadastroUsuario.html', {'form': form})
 
 @login_required(login_url='start_page')
 def cadastroCliente_page(request):
-    return render(request, 'cadastro/cadastroCliente.html')
+    form = ClienteForm()
+    return render(request, 'cadastro/cadastroCliente.html', {'form' : form})
 
 @login_required(login_url='start_page')
 def cadastroFornecedor_page(request):
-    return render(request, 'cadastro/cadastroFornecedor.html')
+    form = FornecedorForm()
+    return render(request, 'cadastro/cadastroFornecedor.html', {'form':form})
 
 @login_required(login_url='start_page')
 def cadastroProduto_page(request):
-    return render(request, 'cadastro/cadastroProduto.html')
+    form = ProdutoForm()
+    return render(request, 'cadastro/cadastroProduto.html', {'form': form})
 
 @login_required(login_url='start_page')
 def cadastroNotaFiscal_page(request):
-    return render(request, 'cadastro/notafiscal.html')
+    ItemFormSet = inlineformset_factory(
+        NotaFiscal, ItemNotaFiscal, form=ItemNotaFiscalForm,
+        extra=1, can_delete=True
+    )
+    
+    nota_form = NotaFiscalForm()
+    formset = ItemFormSet()
+    
+    return render(request, 'cadastro/notafiscal.html', {'nota_form':nota_form, 'formset':formset})
 
 @login_required(login_url='start_page')
 def exibir_clientes_page(request):
@@ -245,3 +326,17 @@ def exibir_produtos_page(request):
         'produtos': Produtos.objects.all()
     }
     return render(request, 'exibicao/exibirProduto.html', produtos)
+
+@login_required(login_url='start_page')
+def exibir_notasFiscais_page(request):
+    notas_fiscais = {
+        'notas_fiscais':NotaFiscal.objects.all()
+    }
+    return render(request, 'exibicao/exibirNotaFiscal.html', notas_fiscais)
+
+@login_required(login_url='start_page')
+def exibirProdutoNotaFiscal_page(request):
+    produtos = {
+        'produtos':Produtos.objects.all()
+    }
+    return render(request, 'cadastro/exibirProdutoNotaFiscal.html', produtos)

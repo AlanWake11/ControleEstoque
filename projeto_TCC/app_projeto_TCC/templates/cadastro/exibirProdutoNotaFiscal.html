@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Selecionar Produto</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <div class="container mt-5">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">Selecionar Produto</h4>
+      </div>
+      <div class="card-body">
+
+        <table class="table table-hover table-bordered text-center align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Código</th>
+              <th>Nome</th>
+              <th>Validade</th>
+              <th>Local</th>
+              <th>Valor Unitário</th>
+              <th>Quant.</th>
+              <th>Unid.</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for produto in produtos %}
+            <tr>
+              <td>{{produto.id}}</td>
+              <td>{{produto.nome}}</td>
+              <td>{{produto.validade}}</td>
+              <td>{{produto.localizacao}}</td>
+              <td>{{produto.preco_custo}}</td>
+              <td>{{produto.quantidade_estoque}}</td>
+              <td>{{produto.unidade_medida}}</td>
+              <td>
+                <button class="btn btn-success btn-sm"
+                  data-codigo="{{ produto.id }}"
+                  data-nome="{{ produto.nome|escapejs }}"
+                  data-validade="{{ produto.validade|date:'d/m/Y' }}"
+                  data-local="{{ produto.localizacao|escapejs }}"
+                  data-valor="{{ produto.preco_custo|floatformat:2 }}"
+                  data-quantidade="{{ produto.quantidade_estoque }}"
+                  data-unidade="{{ produto.unidade_medida|escapejs }}"
+                  onclick="adicionarPorData(this)">
+                  Adicionar
+                </button>
+
+              
+              </td>
+            </tr>
+            {%endfor%}
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function adicionarProduto(codigo, nome, validade, local, valorUnitario, quantidade, unidade) {
+      const total = (valorUnitario * quantidade).toFixed(2);
+      const novoItem = { codigo, nome, validade, local, valorUnitario, quantidade, unidade, total };
+
+      let itens = JSON.parse(localStorage.getItem("itensNota")) || [];
+      itens.push(novoItem);
+      localStorage.setItem("itensNota", JSON.stringify(itens));
+
+      window.close(); // fecha a aba ou popup
+    }
+
+    function adicionarPorData(botao) {
+      const codigo = botao.dataset.codigo;
+      const nome = botao.dataset.nome;
+      const validade = botao.dataset.validade;
+      const local = botao.dataset.local;
+      const valorUnitario = parseFloat(botao.dataset.valor);
+      const quantidade = parseInt(botao.dataset.quantidade);
+      const unidade = botao.dataset.unidade;
+
+      adicionarProduto(codigo, nome, validade, local, valorUnitario, quantidade, unidade);
+    }
+
+  </script>
+
+</body>
+</html>
